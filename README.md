@@ -36,7 +36,7 @@ Run `python train.py -h` to see the possible values of the arguments.
 | hist      | -   | - | - |  -    |   -  |
 | multirms      | 50.93%   | 66.82%| 48.69% |  81.21%    |   **93.27%**  |
 | pmrms      | 81.96%   | 82.42%| 48.69% |  81.21%    |   **92.52%**  |
-| kmrms      | **64.67%**   | 23.92%| 15.88% |  39.65%    |   fail  |
+| kmrms      | **64.67%**   | 23.92%| 15.88% |  39.65%    |   -  |
 | fourier      | -   | -| - |  -    |  -  |
 #### Testing on Logicial Fixed Window Dataset
 | Features |   rf    | SVM  | FcNET  | ConvNET  | CapsNET  |
