@@ -5,7 +5,7 @@ from sklearn.decomposition import PCA
 class PaddedMultiRMS(FeatureExtractor):
 
     num_descriptors     = 5
-    window_size         = 200
+    window_size         = 150
     num_channels        = 16
     pca_dim             = 16
 

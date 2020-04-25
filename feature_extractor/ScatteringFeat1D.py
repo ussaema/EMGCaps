@@ -19,7 +19,8 @@ class ScatteringFeat1D(FeatureExtractor):
     T = 200     # Number of samples per feature vector
     Q = 2       # Resolution per octave
 
-    def __init__(self):
+    def __init__(self, dataset_name):
+        self.dataset_name = dataset_name
         self.scattering_transform = Scattering1D(self.J, self.T, self.Q)
 
     def extract_feature_point(self, raw_samples):

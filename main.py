@@ -4,6 +4,9 @@ import numpy as np
 
 # ### import dataset
 from NinaPro import NinaPro
+from sklearn.decomposition import PCA
+from matplotlib import pyplot
+from mpl_toolkits.mplot3d import Axes3D
 
 ######################################################
 # ### import dataset constructors
@@ -14,12 +17,12 @@ from NinaPro import NinaPro
 # basevar: same version as base but the window size of a gesture is variable (corrected ground truth using the estimated gesture length) num_samples_train => 2120 num_samples_test = 1070
 # v1var: same version as v1 but the window size of a gesture is variable (corrected ground truth using the estimated gesture length) num_samples_train => 2552 num_samples_test = 638
 
-from dataset_constructor.BaselineDataset import BaselineDataset
-from dataset_constructor.BaselineVariableWindowDataset import BaselineVariableWindowDataset
-from dataset_constructor.LogicalDataset import LogicalDataset
-from dataset_constructor.LogicalVariableWindowDataset import LogicalVariableWindowDataset
-data_choices = {"base": BaselineDataset, "basevar": BaselineVariableWindowDataset,
-                "v1": LogicalDataset, "v1var": LogicalVariableWindowDataset}
+from dataset_constructor.IntraSubjectsDataset import IntraSubjectsDataset
+from dataset_constructor.IntraSubjectsVariableWindowDataset import IntraSubjectsVariableWindowDataset
+from dataset_constructor.InterSubjectsDataset import InterSubjectsDataset
+from dataset_constructor.InterSubjectsVariableWindowDataset import InterSubjectsVariableWindowDataset
+data_choices = {"intrasubjects": IntraSubjectsDataset, "intrasubjects_var": IntraSubjectsVariableWindowDataset,
+                "intersubjects": InterSubjectsDataset, "intersubjects_var": InterSubjectsVariableWindowDataset}
 
 ######################################################
 # ### import feature extractors
@@ -69,16 +72,16 @@ def main():
     import argparse
     import os
     # setting the hyper parameters
-    parser = argparse.ArgumentParser(description="EMG classification (NinaPro5)")
+    parser = argparse.ArgumentParser(description="EMGCaps classification (NinaPro5)")
     # model, feature and dataset selectors
     parser.add_argument('--model', default='rf', help=list(model_choices.keys()))
     parser.add_argument('--features', default='rms', help=list(feature_choices.keys()))
-    parser.add_argument('--data', default='base', help=list(data_choices.keys()))
+    parser.add_argument('--data', default='intrasubjects', help=list(data_choices.keys()))
     # training params
-    parser.add_argument('--epochs', default=50, type=int)
+    parser.add_argument('--epochs', default=100, type=int)
     parser.add_argument('--chkpt_period', default=1, type=int)
     parser.add_argument('--valid_period', default=1, type=int)
-    parser.add_argument('--batch_size', default=5, type=int)
+    parser.add_argument('--batch_size', default=32, type=int)
     parser.add_argument('--lr', default=1e-3, type=float, help="Initial learning rate")
     parser.add_argument('--weight_decay', default=1e-5, type=float, help="Weight decay")
     parser.add_argument('--num_workers', default=1, type=int, help="Number of workers")
@@ -129,6 +132,20 @@ def main():
 
         print("Extracting dataset features for training, and testing...") #dataset creator (feature extractor)
         dataset.create_dataset(loaded_nina)
+    """import matplotlib as mpl
+    mpl.style.use('seaborn-paper')
+    pca = PCA(n_components=3)
+    projected = pca.fit_transform(dataset.train_features.reshape((dataset.train_features.shape[0], -1)))
+
+    fig = pyplot.figure()
+    ax = Axes3D(fig)
+    ax.set_xlabel('PC 1')
+    ax.set_ylabel('PC 2')
+    ax.set_zlabel('PC 3')
+    ax.scatter(projected[:,0], projected[:,1], projected[:,2], label=dataset.train_labels, c=(dataset.train_labels), cmap='jet')
+    pyplot.title('3D representation of NinaPro DB5 EMG signals using PCA')
+    pyplot.savefig('emg_data.pdf')"""
+
     # dataset.train_features 13050x16, dataset.train_labels 13050, dataset.test_features 6503x16, dataset.test_labels 6503
     # model
     classifier = model_choices[args.model](args.model_dir, feat_extractor)
@@ -141,6 +158,7 @@ def main():
     #dataset.test_features = dataset.test_features.reshape((dataset.test_features.shape[0], -1))
 
     train_features = dataset.train_features.astype(float)
+
     train_labels = dataset.train_labels
     test_features = dataset.test_features.astype(float)
     test_labels = dataset.test_labels
