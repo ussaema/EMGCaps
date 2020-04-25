@@ -1,15 +1,17 @@
-import os
 from . import Dataset
+
 #
-# Rather than split training/testing based on movement number, this dataset splits based on patients:
-#   --> Via use of NCC (Normalized Cross Correlation), data for patients 8 and 10 are the furthest away.
+# The training/validation/testing dataset described in
+#   "Comparison of six electromyography acquisition setups on hand movement classification tasks"
+#       by Stefano Pizzolato, et al.
 #
-class LogicalDataset(Dataset):
+class IntraSubjectsDataset(Dataset):
 
     def process_single_exercise(self, loaded_data, patient, ex, num_samples, num_rest_samples, obtain_all_samples,
                                     adjust_labels):
-        cur_data    = loaded_data[patient][ex]
-        num_emg     = cur_data["emg"].shape[0]
+
+        cur_data = loaded_data[patient][ex]
+        num_emg = cur_data["emg"].shape[0]
 
         # Look for possible windows of EMG data
         #
@@ -53,7 +55,8 @@ class LogicalDataset(Dataset):
                             window_label += self.E1_classes + self.E2_classes
                         elif ex == self.E2_name:
                             window_label += self.E1_classes
-                    if (os.path.basename(patient) == "s8") or (os.path.basename(patient) == "s10"):
+
+                    if (win_repetition == 2) or (win_repetition == 5):
                         self.test_features.append(win_feat)
                         self.test_labels.append(window_label)
                     else:
@@ -66,4 +69,4 @@ class LogicalDataset(Dataset):
                 start_window += offset
 
     def get_dataset_name(self):
-        return "logical_v1"
+        return "intrasubjects"

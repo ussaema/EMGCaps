@@ -8,7 +8,7 @@ from . import Dataset
 #
 #   Note: Except here, the "window" is now the entire movement with corrected ground truth --> "Variable" Window
 #
-class LogicalVariableWindowDataset(Dataset):
+class InterSubjectsVariableWindowDataset(Dataset):
 
     def process_single_exercise(self, loaded_data, patient, ex, num_samples, num_rest_samples, obtain_all_samples,
                                     adjust_labels):
@@ -74,4 +74,4 @@ class LogicalVariableWindowDataset(Dataset):
                 start_window += offset
 
     def get_dataset_name(self):
-        return "logical_variable"
+        return "intersubjects_variable"

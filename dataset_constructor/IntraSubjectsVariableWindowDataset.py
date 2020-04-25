@@ -1,5 +1,5 @@
 from . import Dataset
-
+import numpy as np
 #
 # The training/validation/testing dataset described in
 #   "Comparison of six electromyography acquisition setups on hand movement classification tasks"
@@ -7,7 +7,7 @@ from . import Dataset
 #
 #   Note: Except here, the "window" is now the entire movement with corrected ground truth --> "Variable" Window
 #
-class BaselineVariableWindowDataset(Dataset):
+class IntraSubjectsVariableWindowDataset(Dataset):
 
     def process_single_exercise(self, loaded_data, patient, ex, num_samples, num_rest_samples, obtain_all_samples,
                                     adjust_labels):
@@ -52,7 +52,7 @@ class BaselineVariableWindowDataset(Dataset):
                     win_feat = self.feature_extractor.extract_feature_point(emg_window)
                     win_repetition = cur_data["rerepetition"][start_window]
 
-                    # Correct the window label
+                    # Correct the window label (offsets)
                     if (window_label != self.rest_label) and adjust_labels:
                         if ex == self.E3_name:
                             window_label += self.E1_classes + self.E2_classes
@@ -72,5 +72,12 @@ class BaselineVariableWindowDataset(Dataset):
             else:
                 start_window += offset
 
+        if not obtain_all_samples:
+            max_size = np.max([feature.shape[0] for feature in self.test_features] + [feature.shape[0] for feature in self.train_features])
+
+            self.train_features = [np.concatenate([feature,np.zeros((max_size-feature.shape[0], feature.shape[1]), dtype=feature.dtype)]) if max_size > feature.shape[0] else feature for feature in self.train_features ]
+            self.test_features = [np.concatenate([feature,np.zeros((max_size-feature.shape[0], feature.shape[1]), dtype=feature.dtype)]) if max_size > feature.shape[0] else feature for feature in self.test_features]
+
+
     def get_dataset_name(self):
-        return "baseline_variable"
+        return "intrasubjects_variable"
