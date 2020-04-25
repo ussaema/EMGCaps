@@ -68,7 +68,8 @@ class Structure(torch.nn.Module):
         self.relu = nn.ReLU()
 
     def forward(self, x):
-        x = self.batch_norm1(x.flatten(1)).view(*x.shape)
+        if x.shape[0] > 1:
+            x = self.batch_norm1(x.flatten(1)).view(*x.shape)
         x = self.relu(self.conv(x))
         x = self.maxpool(x)
         y = self.fcn(x.flatten(1))

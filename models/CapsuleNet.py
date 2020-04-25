@@ -163,11 +163,18 @@ class Structure(nn.Module):
         self.relu = nn.ReLU()
 
     def forward(self, x, y=None):
-        x = self.batch_norm1(x.flatten(1)).view(*x.shape)
+        import matplotlib.pyplot as plt
+        if x.shape[0] > 1:
+            x = self.batch_norm1(x.flatten(1)).view(*x.shape)
         x = self.relu(self.conv(x))
-        x = self.batch_norm2(x.flatten(1)).view(*x.shape)
+        #img = x.cpu().detach().numpy()[0]
+        #plt.imshow(img)
+        #plt.savefig('conv.svg')
+        if x.shape[0] > 1:
+            x = self.batch_norm2(x.flatten(1)).view(*x.shape)
         x = self.primarycaps(x)
-        x = self.batch_norm3(x.flatten(1)).view(*x.shape)
+        if x.shape[0] > 1:
+            x = self.batch_norm3(x.flatten(1)).view(*x.shape)
         x = self.digitcaps(x)
         length = x.norm(dim=-1)
         index = length.max(dim=1)[1]

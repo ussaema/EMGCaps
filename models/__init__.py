@@ -41,6 +41,7 @@ class ClassifierModel(ABC):
         :param valid_features: A numpy array, a member of a Dataset object, containing features for validation
         :param valid_labels:  A numpy array, a member of a Dataset object, containing label for validation
         """
+
         params = {}
         for key, val in args.items():
             if args['model'] in key:
@@ -54,6 +55,7 @@ class ClassifierModel(ABC):
         if not os.path.exists(self.full_model_path):
             os.makedirs(self.full_model_path)
         pass
+        #self.save_log(self.full_model_path)
 
     @abstractmethod
     def test(self, test_features, test_labels):
@@ -265,11 +267,9 @@ class TorchModel(ClassifierModel):
         test_acc = self.classerr.value()
         test_loss = self.meter_loss.value()
         try:
-            pass
-            #self.batches_iterator.set_description(self.batches_iterator.desc + ' | Testing accuracy: %.2f, Testing loss: %.2f' % (test_acc[0], test_loss[0]))
-            #self.batches_iterator.close()
+            self.epochs_iterator.set_description('Testing accuracy: %.2f, Testing loss: %.2f' % (test_acc[0], test_loss[0]))
         except:
-            print('Testing accuracy: %.2f, Testing loss: %.2f' % (test_acc[0], test_loss[0]))
+            pass
         self.hook('on_end', state)
         return test_acc, test_loss
 
@@ -292,6 +292,7 @@ class TorchModel(ClassifierModel):
         self.train_labels = train_labels
         self.valid_features = valid_features
         self.valid_labels   = valid_labels
+        self.verbose = verbose
 
         dim_in = train_features[0].shape
 
@@ -309,7 +310,7 @@ class TorchModel(ClassifierModel):
             weight_decay=self.weight_decay
         )
         self.load_checkpoint(self.full_model_path)
-
+        self.save_log(self.full_model_path)
         if self.start_epoch < self.epochs:
 
             torch_dataset = torchnet.dataset.TensorDataset([
@@ -585,17 +586,18 @@ class TorchModel(ClassifierModel):
         if len(self.train_accs) > 0 or len(self.test_accs) > 0:
             np.savetxt(os.path.join(path,'accs.csv'), np.array([self.train_accs, self.test_accs]).transpose(), fmt='%.18e', delimiter=',', newline='\n', header='train_accs,test_accs', footer='', comments='', encoding=None)
         if len(self.train_losses) > 0 or len(self.test_losses) > 0:
-            np.savetxt(os.path.join(path,'losses.csv'), np.array([self.train_losses, self.train_losses]).transpose(), fmt='%.18e', delimiter=',', newline='\n', header='train_losses,test_losses', footer='', comments='', encoding=None)
-        log_file = open(os.path.join(path,'log.txt'), "w")
-        par = ''
-        for key, val in self.args.items():
-            par += str(key) + ': ' + str(val) + '\n'
-        log_file.write("best_val_acc: "+str(np.array(self.test_accs).max()) + ' @ '+str(np.argmax(np.array(self.test_accs))+1) +'\n' \
-                       + "best_train_acc: "+str(np.array(self.train_accs).max()) + ' @ '+str(np.argmax(np.array(self.train_accs))+1) +'\n'\
-                       +"best_val_loss: "+str(np.array(self.test_losses).min()) + ' @ '+str(np.argmin(np.array(self.test_losses))+1) +'\n' \
-                       + "best_train_loss: "+str(np.array(self.train_losses).min()) + ' @ '+str(np.argmin(np.array(self.train_losses))+1) +'\n'+
-                       par)
-        log_file.close()
+            np.savetxt(os.path.join(path,'losses.csv'), np.array([self.train_losses, self.test_losses]).transpose(), fmt='%.18e', delimiter=',', newline='\n', header='train_losses,test_losses', footer='', comments='', encoding=None)
+        if (len(self.train_losses) > 0 or len(self.test_losses) > 0) and (len(self.train_accs) > 0 or len(self.test_accs) > 0):
+            log_file = open(os.path.join(path,'log.txt'), "w")
+            par = ''
+            for key, val in self.args.items():
+                par += str(key) + ': ' + str(val) + '\n'
+            log_file.write("best_val_acc: "+str(np.array(self.test_accs).max()) + ' @ '+str(np.argmax(np.array(self.test_accs))+1) +'\n' \
+                           + "best_train_acc: "+str(np.array(self.train_accs).max()) + ' @ '+str(np.argmax(np.array(self.train_accs))+1) +'\n'\
+                           +"best_val_loss: "+str(np.array(self.test_losses).min()) + ' @ '+str(np.argmin(np.array(self.test_losses))+1) +'\n' \
+                           + "best_train_loss: "+str(np.array(self.train_losses).min()) + ' @ '+str(np.argmin(np.array(self.train_losses))+1) +'\n'+
+                           par)
+            log_file.close()
 
     @abstractmethod
     def forward_pass(self, sample):
