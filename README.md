@@ -30,7 +30,7 @@ Run `python train.py -h` to see the possible values of the arguments.
 
 ### Results
 #### Testing on Intrasubject Fixed Window Dataset
-| Features |   rf    | SVM  | FcNET  | ConvNET  | CapsNET  |
+| Features |   rf    | SVM  | FCN  | CNN  | EMGCaps  |
 | -------- |:-------:| ----:| ------:| --------:| --------:|
 | rms      | 66.56% | 52.06% | 67.67% | 55.54% | **76.04%** |
 | hist      | 56.34% | 38.58% | 49.28% | 53.88% | **65.67%** |
@@ -41,14 +41,14 @@ Run `python train.py -h` to see the possible values of the arguments.
 
 
 #### Testing on Intrasubject Variable Window Dataset
-| Features |   rf    | SVM  | FcNET  | ConvNET  | CapsNET  |
+| Features |   rf    | SVM  | FCN  | CNN  | EMGCaps  |
 | -------- |:-------:| ----:| ------:| --------:| --------:|
 | rms      | 79.53%   | 53.27%| 74.67% |  66.26%    |   **90.56%**  |
 | multirms      | 50.93%   | 66.82%| 48.69% |  81.21%    |   **93.27%**  |
 | pmrms      | 81.96%   | 82.42%| 48.69% |  81.21%    |   **92.52%**  |
 | kmrms      | 64.67%   | 23.92%| 15.88% |  39.65%    |   **85.04%**  |
 #### Testing on Intersubject Fixed Window Dataset
-| Features |   rf    | SVM  | FcNET  | ConvNET  | CapsNET  |
+| Features |   rf    | SVM  | FCN  | CNN  | EMGCaps  |
 | -------- |:-------:| ----:| ------:| --------:| --------:|
 | rms      | 15%   | 14.8%| **17.42%** |  16.2%    |   15.56%  |
 | hist      | 14.82%   | 14.95% | 14.67% |  14.88%    |   **15.21%**  |
@@ -58,7 +58,7 @@ Run `python train.py -h` to see the possible values of the arguments.
 | fourier      | 16.02% | 14.95% | 16.98% |  17.42%  | **20.54%** |
 
 #### Testing on Intersubject Variable Window Dataset
-| Features |   rf    | SVM  | FcNET  | ConvNET  | CapsNET  |
+| Features |   rf    | SVM  | FCN  | CNN  | EMGCaps  |
 | -------- |:-------:| ----:| ------:| --------:| --------:|
 | rms      | 15.2%  | 15.67%| 19.27% | 19.59%  | **20.84%**  |
 | multirms      | 22.88%  | 20.53% | 27.27% |  27.11%  |  **28.99%**  |
